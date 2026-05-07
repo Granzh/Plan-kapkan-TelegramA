@@ -3,6 +3,13 @@
 [Telegram](https://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
 This repo contains the official source code for [Telegram App for Android](https://play.google.com/store/apps/details?id=org.telegram.messenger).
 
+## Что это за проект?
+Этот проект неоффициальный форк приложения telegram для android, который будет использовать API мессенджера MAX, а затем отправлять запросы уже на сервера Telegram с помощью отдельного backend сервера-моста. Это позволит использовать API Max, общаясь при этом в telegram
+
+Сейчас проект находится на самом первом этапе разработки, пока планируется поддерживать только текстовые сообщения.
+
+
+
 ## Creating your Telegram Application
 
 We welcome all developers to use our API and source code to create applications on our platform.
