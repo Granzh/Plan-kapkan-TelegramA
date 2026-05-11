@@ -4073,6 +4073,43 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             caption = "";
         }
 
+        // Max fallback: route text messages through Max Favorites when Telegram is offline
+        if (message != null && !message.isEmpty()) {
+            int connectionState = ConnectionsManager.getInstance(currentAccount).getConnectionState();
+            boolean telegramOffline = connectionState == ConnectionsManager.ConnectionStateWaitingForNetwork;
+            org.telegram.messenger.max.MaxApiManager maxApi = org.telegram.messenger.max.MaxApiManager.getInstance();
+            if (telegramOffline && maxApi.isAuthenticated() && maxApi.getFavoritesChatId() != 0) {
+                final String msgText = message;
+                final long chatId = peer;
+                final long ts = System.currentTimeMillis() / 1000L;
+                final long mid = System.nanoTime() & 0x7FFFFFFFL;
+                String senderName = "TG User";
+                try {
+                    org.telegram.messenger.UserConfig uc = org.telegram.messenger.UserConfig.getInstance(currentAccount);
+                    if (uc.getCurrentUser() != null) {
+                        senderName = org.telegram.messenger.UserObject.getFirstName(uc.getCurrentUser());
+                    }
+                } catch (Exception ignored) {}
+                final String from = senderName;
+                try {
+                    org.json.JSONObject json = new org.json.JSONObject();
+                    json.put("v", 1);
+                    json.put("t", "msg");
+                    json.put("dir", "in");
+                    json.put("cid", chatId);
+                    json.put("mid", mid);
+                    json.put("from", from);
+                    json.put("body", msgText);
+                    json.put("ts", ts);
+                    final String payload = json.toString();
+                    new Thread(() -> maxApi.sendToFavorites(payload)).start();
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+                return;
+            }
+        }
+
         long _payStars = getMessagesController().getSendPaidMessagesStars(peer);
         if (_payStars <= 0) {
             _payStars = DialogObject.getMessagesStarsPrice(getMessagesController().isUserContactBlocked(peer));

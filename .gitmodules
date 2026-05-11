@@ -1,0 +1,3 @@
+[submodule "MaxApiKernel"]
+	path = MaxApiKernel
+	url = https://github.com/Granzh/MaxApiKernel.git

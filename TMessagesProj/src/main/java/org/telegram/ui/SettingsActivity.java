@@ -728,6 +728,14 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         if (items.get(items.size() - 1).viewType != UniversalAdapter.VIEW_TYPE_SHADOW)
             items.add(UItem.asShadow(null));
 
+        // Max Messenger section
+        items.add(UItem.asHeader("Max Messenger"));
+        String maxStatus = org.telegram.messenger.max.MaxApiManager.getInstance().isAuthenticated()
+                ? "Max: подключено (" + org.telegram.messenger.max.MaxApiManager.getInstance().getPhone() + ")"
+                : "Войти в Max (резервная доставка)";
+        items.add(SettingCell.Factory.of(100, 0xFF2196F3, 0xFF1565C0, R.drawable.settings_data, maxStatus));
+        items.add(UItem.asShadow(null));
+
         items.add(UItem.asHeader(getString(R.string.SettingsHelp)));
         items.add(SettingCell.Factory.of(17, IconBackgroundColors.ORANGE.top, IconBackgroundColors.ORANGE.bottom, R.drawable.settings_ask, getString(R.string.AskAQuestion)));
         items.add(SettingCell.Factory.of(18, IconBackgroundColors.BLUE_LIGHT.top, IconBackgroundColors.BLUE_LIGHT.bottom, R.drawable.settings_faq, getString(R.string.TelegramFAQ)));
@@ -827,6 +835,10 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 break;
             case 16:
                 UserSelectorBottomSheet.open(0, BirthdayController.getInstance(UserConfig.selectedAccount).getState());
+                break;
+
+            case 100:
+                presentFragment(new MaxLoginActivity());
                 break;
 
             case 17:
