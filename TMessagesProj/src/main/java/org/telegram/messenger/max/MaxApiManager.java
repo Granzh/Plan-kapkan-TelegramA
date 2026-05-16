@@ -72,6 +72,11 @@ public class MaxApiManager {
         void onError(String error);
     }
 
+    public interface PingCallback {
+        void onResult(long pingMs);
+        void onError(String error);
+    }
+
     /** Step 1: connect + request SMS code for phone. */
     public void requestCode(String phoneNumber, AuthCallback callback) {
         ioExecutor.submit(() -> {
@@ -140,6 +145,33 @@ public class MaxApiManager {
                     .apply();
             phone = "";
             favoritesChatId = 0;
+        });
+    }
+
+    /**
+     * Measures round-trip latency to Max servers by timing a connect call.
+     * Callback fires on the IO thread — post to main thread before touching UI.
+     */
+    public void checkConnection(PingCallback callback) {
+        ioExecutor.submit(() -> {
+            if (nativeHandle == 0) {
+                callback.onError("Клиент не инициализирован");
+                return;
+            }
+            try {
+                long start = System.currentTimeMillis();
+                boolean ok = MaxApiJni.nativeConnect(nativeHandle);
+                long elapsed = System.currentTimeMillis() - start;
+                if (ok) {
+                    callback.onResult(elapsed);
+                } else {
+                    callback.onError("Сервер недоступен");
+                }
+            } catch (UnsatisfiedLinkError e) {
+                callback.onError("Нативная библиотека не загружена");
+            } catch (Exception e) {
+                callback.onError(e.getMessage());
+            }
         });
     }
 

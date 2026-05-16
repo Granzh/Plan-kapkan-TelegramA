@@ -7983,8 +7983,14 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         Runnable action = null;
         currentConnectionState = ConnectionsManager.getInstance(currentAccount).getConnectionState();
         if (currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork) {
-            title = "WaitingForNetwork";
-            titleId = R.string.WaitingForNetwork;
+            org.telegram.messenger.max.MaxApiManager maxApi = org.telegram.messenger.max.MaxApiManager.getInstance();
+            if (maxApi.isAuthenticated() && maxApi.getFavoritesChatId() != 0) {
+                title = "SendingViaMax";
+                titleId = R.string.SendingViaMax;
+            } else {
+                title = "NoConnection";
+                titleId = R.string.NoConnection;
+            }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateUpdating) {
             title = "Updating";
             titleId = R.string.Updating;

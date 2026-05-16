@@ -838,7 +838,11 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 break;
 
             case 100:
-                presentFragment(new MaxLoginActivity());
+                if (org.telegram.messenger.max.MaxApiManager.getInstance().isAuthenticated()) {
+                    presentFragment(new MaxAccountFragment());
+                } else {
+                    presentFragment(new MaxLoginActivity());
+                }
                 break;
 
             case 17:
